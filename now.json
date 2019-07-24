@@ -1,0 +1,29 @@
+{
+    "name": "my-node-project",
+    "version": 2,
+    "alias": "napi.sanbaofengs.com",
+    "public": true,
+    "env": {
+        "FOO": "@foo"
+    },
+    "builds": [
+        {
+            "src": "/api/*.js",
+            "use": "@now/node",
+            "config": {
+                "helpers": "false"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/qr",
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*"
+            },
+            "dest": "/api/qr.js"
+        }
+    ]
+}

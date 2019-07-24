@@ -1,0 +1,15 @@
+{
+    "name": "node-lambda",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "n": "now --target production",
+        "dev": "now dev -p 1236"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "log4js": "^4.5.1",
+        "path": "^0.12.7",
+        "qr-image": "^3.2.0"
+    }
+}
