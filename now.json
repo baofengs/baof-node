@@ -4,7 +4,9 @@
     "alias": "napi.sanbaofengs.com",
     "public": true,
     "env": {
-        "FOO": "@foo"
+        "FOO": "@foo",
+        "BAO_ACCESS_ID": "@bao_access_id",
+        "BAO_ACCESS_SECRET": "@bao_access_secret"
     },
     "builds": [
         {
@@ -24,6 +26,24 @@
                 "Access-Control-Allow-Methods": "*"
             },
             "dest": "/api/qr.js"
+        },
+        {
+            "src": "/oss-auth",
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*"
+            },
+            "dest": "/api/ossAuth.js"
+        },
+        {
+            "src": "/sts",
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*"
+            },
+            "dest": "/api/sts.js"
         }
     ]
 }

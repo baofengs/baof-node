@@ -1,6 +1,5 @@
 
 const qrImage = require('qr-image');
-const logger = require('../lib/logger');
 
 function generate({url, color, bg}) {
     return new Promise((resolve, reject) => {
