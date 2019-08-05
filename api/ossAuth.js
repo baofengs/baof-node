@@ -1,7 +1,7 @@
 
 const crypto = require('crypto');
 const Core = require('@alicloud/pop-core');
-const { OSS_HOST, SOURCE_TYPES } = require('../config/index');
+const { OSS_CDN, OSS_END_POINT, OSS_BUCKET } = require('../config/index');
 
 const MAX_SIZE_OF_FILE = 200 * 1024 * 1024;
 const STS_EXPIRATION = 300000;
@@ -29,26 +29,7 @@ const getSts = () => {
     });
 }
 
-function getBucketBy(type) {
-    let bucket = 'images/';
-    const { image, audio, video } = SOURCE_TYPES;
-    switch (+type) {
-        case image.id:
-            bucket = image.bucket;
-            break;
-        case audio.id:
-            bucket = audio.bucket;
-            break;
-        case video.id:
-            bucket = video.bucket;
-            break;
-        default:
-            bucket = 'images/';
-    }
-    return bucket;
-}
-
-const sign = ({ AccessKeyId, AccessKeySecret }, bucket) => {
+const sign = (AccessKeySecret, bucket) => {
     const expire = new Date().getTime() + STS_EXPIRATION;
     const policyString = JSON.stringify({
         expiration: new Date(expire).toISOString(),
@@ -62,36 +43,37 @@ const sign = ({ AccessKeyId, AccessKeySecret }, bucket) => {
     return {
         expire,
         policy,
-        signature,
-        AccessKeyId
+        signature
     };
 };
 
-const getPolicy = async (type) => {
+const getPolicy = async () => {
     const [error, sts] = await getSts();
     if (error) {
         return [error, null];
     }
     const Credentials = sts.Credentials;
-    const bucket = getBucketBy(type);
-    const { expire, policy, signature, AccessKeyId } = sign(Credentials, bucket);
+    const { AccessKeyId, AccessKeySecret, SecurityToken } = Credentials;
+    const { expire, policy, signature } = sign(AccessKeySecret, OSS_BUCKET);
     return [null, {
-        bucket,
         expire,
         policy,
         signature,
         accessId: AccessKeyId,
+        accessSecret: AccessKeySecret,
         success_action_status: '200',
-        'x-oss-security-token': sts.Credentials.SecurityToken,
-        url: OSS_HOST,
+        securityToken: SecurityToken,
+        endpoint: OSS_END_POINT,
+        bucket: OSS_BUCKET,
+        cdnUrl: OSS_CDN
     }];
 };
 
 module.exports = async (req, res) => {
-    const type = req.query && req.query.type || req.body && req.body['type'] || 1;
-    const [error, policy] = await getPolicy(type);
+    const [error, policy] = await getPolicy();
     if (error) {
         res.code(500).send(error.toString());
+        return;
     }
     res.json({
         code: 0,
